@@ -1,0 +1,148 @@
+import { useMemo, useState } from 'react';
+import { products } from '../data/products.js';
+import listThumb1 from '../assets/images/list-thumb-1.webp';
+import listThumb2 from '../assets/images/list-thumb-2.webp';
+import listHover from '../assets/images/list-hover.webp';
+
+const filters = [
+  '전체보기',
+  '반팔',
+  '바람막이/집업',
+  '맨투맨/후디',
+  '긴팔',
+  '스커트',
+  '슈즈',
+  '액세서리',
+  '테니스',
+  '라이프스타일',
+  '클래식 셋업',
+  '브라탑',
+];
+
+const sizes = ['220', '225', '230', '235', '240', '245', '250', '255', '260'];
+
+function Products({ onProductDetail }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const itemsPerPage = 8;
+
+  const productList = useMemo(
+    () =>
+      Array.from({ length: 16 }, (_, index) => ({
+        ...products[index % products.length],
+        id: index + 1,
+      })),
+    [],
+  );
+
+  const pageCount = Math.ceil(productList.length / itemsPerPage);
+  const visibleProducts = productList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  const changePage = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleFilter = (filter) => {
+    setActiveFilter(filter);
+    setCurrentPage(1);
+  };
+
+  return (
+    <section className="products_page">
+      <div className="product_list_header">
+        <span className="breadcrumb">
+          <button type="button">WOMEN</button>
+          <span>&gt;</span>
+          <button type="button">의류</button>
+          <span>&gt;</span>
+          <button type="button">{activeFilter}</button>
+        </span>
+
+        <h1>{activeFilter}</h1>
+        <div className="filter_container">
+          <ul>
+            {filters.map((filter) => (
+              <li key={filter}>
+                <button className="filter_text_btn" type="button" onClick={() => handleFilter(filter)}>
+                  {filter}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="button_container">
+          <button className="filter_btn" type="button">
+            <span className="filter_icon">+</span>
+            <span>필터보기</span>
+          </button>
+          <button className="sort_btn" type="button">
+            <span>신상품순</span>
+            <span>v</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="product_list">
+        <ul id="productList">
+          {visibleProducts.map((product) => (
+            <li key={product.id}>
+              <button type="button" onClick={() => onProductDetail(product)}>
+                <div className="image_container">
+                  <div className="image_info">
+                    <img src={product.image} className="main_img" alt={product.name} />
+                    <img src={listHover} className="hover_img" alt={product.name} />
+                  </div>
+                  <div className="popup_container">
+                    <span>
+                      QUICK ADD <span className="quick_bag">+</span>
+                    </span>
+                    <ul>
+                      {sizes.map((size) => (
+                        <li key={size}>{size}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <img src={listThumb1} alt="" />
+                <img src={listThumb2} alt="" />
+                <span className="tag">{product.category}</span>
+                <strong className="title">{product.name}</strong>
+                <strong className="price">{product.price}</strong>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="pagination">
+        <button className="pagination_arrow" type="button" onClick={() => changePage(Math.max(1, currentPage - 1))}>
+          {'<'}
+        </button>
+        {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
+          <button
+            className={currentPage === page ? 'pagination_btn active' : 'pagination_btn'}
+            type="button"
+            key={page}
+            onClick={() => changePage(page)}
+          >
+            {page}
+          </button>
+        ))}
+        <button
+          className="pagination_arrow"
+          type="button"
+          onClick={() => changePage(Math.min(pageCount, currentPage + 1))}
+        >
+          {'>'}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export default Products;
