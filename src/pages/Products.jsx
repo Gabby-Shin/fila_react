@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import ArrowButton, { ArrowIcon } from '../components/ArrowButton.jsx';
 import { products } from '../data/products.js';
 import listThumb1 from '../assets/images/list-thumb-1.webp';
 import listThumb2 from '../assets/images/list-thumb-2.webp';
@@ -21,18 +22,26 @@ const filters = [
 
 const sizes = ['220', '225', '230', '235', '240', '245', '250', '255', '260'];
 
-function Products({ onProductDetail }) {
+function Products({ onProductDetail, searchQuery, onSearch }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const itemsPerPage = 8;
 
   const productList = useMemo(
-    () =>
-      Array.from({ length: 16 }, (_, index) => ({
+    () => {
+      let baseList = Array.from({ length: 16 }, (_, index) => ({
         ...products[index % products.length],
         id: index + 1,
-      })),
-    [],
+      }));
+
+      if (searchQuery) {
+        return baseList.filter((product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      return baseList;
+    },
+    [searchQuery],
   );
 
   const pageCount = Math.ceil(productList.length / itemsPerPage);
@@ -49,6 +58,7 @@ function Products({ onProductDetail }) {
   const handleFilter = (filter) => {
     setActiveFilter(filter);
     setCurrentPage(1);
+    if (onSearch) onSearch(''); // Clear search when using filters
   };
 
   return (
@@ -59,21 +69,38 @@ function Products({ onProductDetail }) {
           <span>&gt;</span>
           <button type="button">의류</button>
           <span>&gt;</span>
-          <button type="button">{activeFilter}</button>
+          <button type="button">{searchQuery ? '검색 결과' : activeFilter}</button>
         </span>
 
-        <h1>{activeFilter}</h1>
-        <div className="filter_container">
-          <ul>
-            {filters.map((filter) => (
-              <li key={filter}>
-                <button className="filter_text_btn" type="button" onClick={() => handleFilter(filter)}>
-                  {filter}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <h1>{searchQuery ? `'${searchQuery}' 검색 결과` : activeFilter}</h1>
+        {!searchQuery && (
+          <div className="filter_container">
+            <ul>
+              {filters.map((filter) => (
+                <li key={filter}>
+                  <button className="filter_text_btn" type="button" onClick={() => handleFilter(filter)}>
+                    {filter}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {searchQuery && (
+          <div style={{ marginBottom: '32px' }}>
+            <button
+              onClick={() => onSearch('')}
+              style={{
+                padding: '8px 16px',
+                border: '1px solid black',
+                borderRadius: '20px',
+                background: 'white',
+              }}
+            >
+              검색 초기화
+            </button>
+          </div>
+        )}
         <div className="button_container">
           <button className="filter_btn" type="button">
             <span className="filter_icon">+</span>
@@ -81,66 +108,75 @@ function Products({ onProductDetail }) {
           </button>
           <button className="sort_btn" type="button">
             <span>신상품순</span>
-            <span>v</span>
+            <ArrowIcon direction="down" className="summary-arrow-icon" />
           </button>
         </div>
       </div>
 
       <div className="product_list">
-        <ul id="productList">
-          {visibleProducts.map((product) => (
-            <li key={product.id}>
-              <button type="button" onClick={() => onProductDetail(product)}>
-                <div className="image_container">
-                  <div className="image_info">
-                    <img src={product.image} className="main_img" alt={product.name} />
-                    <img src={listHover} className="hover_img" alt={product.name} />
+        {productList.length === 0 ? (
+          <div style={{ padding: '80px 0', textAlign: 'center', fontSize: '20px' }}>
+            검색 결과가 없습니다.
+          </div>
+        ) : (
+          <ul id="productList">
+            {visibleProducts.map((product) => (
+              <li key={product.id}>
+                <button type="button" onClick={() => onProductDetail(product)}>
+                  <div className="image_container">
+                    <div className="image_info">
+                      <img src={product.image} className="main_img" alt={product.name} />
+                      <img src={listHover} className="hover_img" alt={product.name} />
+                    </div>
+                    <div className="popup_container">
+                      <span>
+                        QUICK ADD <span className="quick_bag">+</span>
+                      </span>
+                      <ul>
+                        {sizes.map((size) => (
+                          <li key={size}>{size}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                  <div className="popup_container">
-                    <span>
-                      QUICK ADD <span className="quick_bag">+</span>
-                    </span>
-                    <ul>
-                      {sizes.map((size) => (
-                        <li key={size}>{size}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
 
-                <img src={listThumb1} alt="" />
-                <img src={listThumb2} alt="" />
-                <span className="tag">{product.category}</span>
-                <strong className="title">{product.name}</strong>
-                <strong className="price">{product.price}</strong>
-              </button>
-            </li>
+                  <img src={listThumb1} alt="" />
+                  <img src={listThumb2} alt="" />
+                  <span className="tag">{product.category}</span>
+                  <strong className="title">{product.name}</strong>
+                  <strong className="price">{product.price}</strong>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {productList.length > 0 && (
+        <div className="pagination">
+          <ArrowButton
+            className="pagination_arrow"
+            direction="left"
+            label="Previous page"
+            onClick={() => changePage(Math.max(1, currentPage - 1))}
+          />
+          {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
+            <button
+              className={currentPage === page ? 'pagination_btn active' : 'pagination_btn'}
+              type="button"
+              key={page}
+              onClick={() => changePage(page)}
+            >
+              {page}
+            </button>
           ))}
-        </ul>
-      </div>
-
-      <div className="pagination">
-        <button className="pagination_arrow" type="button" onClick={() => changePage(Math.max(1, currentPage - 1))}>
-          {'<'}
-        </button>
-        {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
-          <button
-            className={currentPage === page ? 'pagination_btn active' : 'pagination_btn'}
-            type="button"
-            key={page}
-            onClick={() => changePage(page)}
-          >
-            {page}
-          </button>
-        ))}
-        <button
-          className="pagination_arrow"
-          type="button"
-          onClick={() => changePage(Math.min(pageCount, currentPage + 1))}
-        >
-          {'>'}
-        </button>
-      </div>
+          <ArrowButton
+            className="pagination_arrow"
+            label="Next page"
+            onClick={() => changePage(Math.min(pageCount, currentPage + 1))}
+          />
+        </div>
+      )}
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { ArrowIcon } from './ArrowButton.jsx';
 import userImage from '../assets/images/review-user.jpg';
 import photo1 from '../assets/images/review-photo-1.webp';
 import photo2 from '../assets/images/review-photo-2.webp';
@@ -41,11 +42,13 @@ const reviews = [
   },
 ];
 
-function ProductReviews() {
+function ProductReviews({ onNavigate }) {
   return (
     <section id="review">
       <h2>REVIEW</h2>
-      <button type="button">리뷰 작성하기</button>
+      <button type="button" onClick={() => onNavigate('reviews')}>
+        리뷰 작성하기
+      </button>
 
       <section className="rating">
         <div className="average_rating">
@@ -80,7 +83,7 @@ function ProductReviews() {
           <h3>포토&동영상</h3>
           <button type="button">
             <span>전체보기</span>
-            <span>&gt;</span>
+            <ArrowIcon />
           </button>
         </div>
         <ul>

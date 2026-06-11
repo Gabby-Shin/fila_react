@@ -1,16 +1,21 @@
 import { useState } from 'react';
+import ArrowButton from '../components/ArrowButton.jsx';
 import HeroCarousel from '../components/HeroCarousel.jsx';
 import LookSlider from '../components/LookSlider.jsx';
-import PrimaryButton from '../components/PrimaryButton.jsx';
 import Popup from '../components/Popup.jsx';
+import heritageImage from '../assets/images/info-heritage-side.png';
 import { heroSlides, homeImages, products, trendTabs } from '../data/products.js';
 
 function Home({ onNavigate, onProductDetail }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupImage, setPopupImage] = useState(homeImages.flow[0]);
   const [activeTrend, setActiveTrend] = useState(trendTabs[0].id);
+  const [slideIndex, setSlideIndex] = useState(0);
+
   const activeTrendIndex = trendTabs.findIndex((tab) => tab.id === activeTrend);
   const visibleProducts = products.filter((product) => product.trendCategory === activeTrend);
-  const trendingProducts = Array.from({ length: 5 }, (_, index) => {
+
+  const trendingProducts = Array.from({ length: 10 }, (_, index) => {
     const baseProduct = visibleProducts[index % visibleProducts.length] || products[index % products.length];
 
     return {
@@ -19,9 +24,19 @@ function Home({ onNavigate, onProductDetail }) {
     };
   });
 
-  const moveTrend = (direction) => {
-    const nextIndex = (activeTrendIndex + direction + trendTabs.length) % trendTabs.length;
-    setActiveTrend(trendTabs[nextIndex].id);
+  const handleTrendChange = (id) => {
+    setActiveTrend(id);
+    setSlideIndex(0);
+  };
+
+  const moveSlide = (direction) => {
+    const maxIndex = trendingProducts.length - 5; // Show 5 at a time
+    setSlideIndex((prev) => {
+      const next = prev + direction;
+      if (next < 0) return 0;
+      if (next > maxIndex) return maxIndex;
+      return next;
+    });
   };
 
   return (
@@ -41,7 +56,7 @@ function Home({ onNavigate, onProductDetail }) {
                   className={tab.id === activeTrend ? 'trend_btn active' : 'trend_btn'}
                   type="button"
                   data-category={tab.id}
-                  onClick={() => setActiveTrend(tab.id)}
+                  onClick={() => handleTrendChange(tab.id)}
                 >
                   {tab.label}
                 </button>
@@ -49,29 +64,36 @@ function Home({ onNavigate, onProductDetail }) {
             ))}
           </ul>
           <div className="button_container">
-            <button
-              className="arrow_button border rounded"
-              type="button"
-              aria-label="Previous category"
-              onClick={() => moveTrend(-1)}
-            >
-              {'<'}
-            </button>
-            <button
-              className="arrow_button border rounded"
-              type="button"
-              aria-label="Next category"
-              onClick={() => moveTrend(1)}
-            >
-              {'>'}
-            </button>
+            <ArrowButton
+              className="border rounded"
+              direction="left"
+              label="Previous products"
+              onClick={() => moveSlide(-1)}
+            />
+            <ArrowButton
+              className="border rounded"
+              label="Next products"
+              onClick={() => moveSlide(1)}
+            />
           </div>
         </div>
 
-        <div className="product_list">
-          <ul id="trendingProductList">
+        <div className="product_list" style={{ overflow: 'hidden' }}>
+          <ul
+            id="trendingProductList"
+            style={{
+              display: 'flex',
+              flexWrap: 'nowrap',
+              transform: `translateX(calc(var(--trend-slide-step, 20%) * -${slideIndex}))`,
+              transition: 'transform 0.5s ease',
+            }}
+          >
             {trendingProducts.map((product) => (
-              <li key={product.viewId} data-category={product.trendCategory}>
+              <li
+                key={product.viewId}
+                data-category={product.trendCategory}
+                style={{ flex: '0 0 var(--trend-card-width, 20%)', padding: '0 var(--trend-card-gutter, 10px)' }}
+              >
                 <a
                   href="#product-detail"
                   onClick={(event) => {
@@ -126,46 +148,64 @@ function Home({ onNavigate, onProductDetail }) {
               <h4>Control The Court</h4>
               <p>코트 위 움직임을 위해 설계된 FILA tennis style.</p>
             </span>
-            <PrimaryButton className="white-button" onClick={() => onNavigate('products')}>
-              View
-            </PrimaryButton>
+            <ArrowButton
+              className="white-button rounded information1_arrow"
+              label="View Control The Court"
+              onClick={() => onNavigate('products')}
+            />
           </article>
           <article className="info_card">
-            <img src={homeImages.info2} alt="FILA active style guide" />
+            <img src={homeImages.info2} alt="FILA heritage collection" />
             <span className="information">
               <h4>Pace Your Day</h4>
               <p>일상부터 퍼포먼스까지 편안하게 이어지는 컬렉션.</p>
             </span>
-            <PrimaryButton className="white-button" onClick={() => onNavigate('products')}>
-              View
-            </PrimaryButton>
+            <ArrowButton
+              className="white-button rounded information1_arrow"
+              label="View Pace Your Day"
+              onClick={() => onNavigate('products')}
+            />
           </article>
         </div>
+      </section>
+
+      <section className="heritage_split_section">
+        <article className="heritage_split_card">
+          <div className="heritage_split_content">
+            <div className="heritage_split_logo" aria-hidden="true" />
+            <p>FILA 아카이브를 기반으로 브랜드의 클래식한 정체성을 담아낸 헤리티지 컬렉션을 소개합니다.</p>
+            <strong>1911 & Everyday Since</strong>
+            <ArrowButton
+              className="white-button rounded heritage_split_arrow"
+              label="View heritage collection"
+              onClick={() => onNavigate('products')}
+            />
+          </div>
+          <img src={heritageImage} alt="FILA heritage collection" />
+        </article>
       </section>
 
       <section className="information4_section">
         <div>
           <h2>Shop the Look</h2>
-          <button
+          <ArrowButton
             type="button"
             className="arrow_button arrow-button rounded information4_button"
             onClick={() => onNavigate('products')}
           >
             <span>더보기</span>
-            <span aria-hidden="true">&gt;</span>
-          </button>
+          </ArrowButton>
         </div>
         <LookSlider
           images={homeImages.flow}
           onItemClick={(imageIndex) => {
-            if (imageIndex === 0) {
-              setIsPopupOpen(true);
-            }
+            setPopupImage(homeImages.flow[imageIndex]);
+            setIsPopupOpen(true);
           }}
         />
       </section>
 
-      <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
+      <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} popupImage={popupImage} />
     </>
   );
 }

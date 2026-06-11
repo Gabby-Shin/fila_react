@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import popupImage from '../assets/images/main-hero.webp';
+import { ArrowIcon } from './ArrowButton.jsx';
+import defaultPopupImage from '../assets/images/main-hero.webp';
 import popupItem1 from '../assets/images/popup-item-1.webp';
 import popupItem2 from '../assets/images/popup-item-2.webp';
 
@@ -24,7 +25,7 @@ const popupProducts = [
 
 const formatPrice = (price) => `${price.toLocaleString('ko-KR')}원`;
 
-function Popup({ isOpen, onClose }) {
+function Popup({ isOpen, onClose, popupImage = defaultPopupImage }) {
   const [checkedIds, setCheckedIds] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState({});
   const allChecked = checkedIds.length === popupProducts.length;
@@ -63,7 +64,7 @@ function Popup({ isOpen, onClose }) {
     >
       <div className="popup">
         <div className="popup_left">
-          <img src={popupImage} alt="FILA popup campaign" />
+          <img src={popupImage} alt="Selected FILA look" />
         </div>
 
         <div className="popup_right">
@@ -104,7 +105,7 @@ function Popup({ isOpen, onClose }) {
                 <details className="accordion">
                   <summary>
                     <span>{selectedSizes[product.id] || '사이즈 선택'}</span>
-                    <span>v</span>
+                    <ArrowIcon direction="down" className="summary-arrow-icon" />
                   </summary>
 
                   <div className="size_box">

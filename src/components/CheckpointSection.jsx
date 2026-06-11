@@ -1,3 +1,4 @@
+import ArrowButton from './ArrowButton.jsx';
 import checkpoint1 from '../assets/images/checkpoint-1.jpg';
 import checkpoint2 from '../assets/images/checkpoint-2.webp';
 import checkpoint3 from '../assets/images/checkpoint-3.webp';
@@ -32,12 +33,8 @@ function CheckpointSection() {
       <div className="check_title">
         <h2>체크포인트</h2>
         <div className="buttons">
-          <button type="button" aria-label="Previous checkpoint">
-            {'<'}
-          </button>
-          <button type="button" aria-label="Next checkpoint">
-            {'>'}
-          </button>
+          <ArrowButton direction="left" label="Previous checkpoint" />
+          <ArrowButton label="Next checkpoint" />
         </div>
       </div>
 

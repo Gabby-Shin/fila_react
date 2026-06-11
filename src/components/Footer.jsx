@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArrowIcon } from './ArrowButton.jsx';
 
 const footerMenus = [
   {
@@ -78,7 +79,7 @@ function Footer() {
                     onClick={() => toggleMenu(menu.title)}
                   >
                     <span>{menu.title}</span>
-                    <span className="footer_accordion_icon">v</span>
+                    <ArrowIcon direction="down" className="footer_accordion_icon" />
                   </button>
                 </h4>
                 <ul>

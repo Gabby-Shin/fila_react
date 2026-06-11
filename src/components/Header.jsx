@@ -48,6 +48,14 @@ function HeaderIcon({ type }) {
     );
   }
 
+  if (type === 'close') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 7h16M4 12h16M4 17h16" />
@@ -56,22 +64,34 @@ function HeaderIcon({ type }) {
 }
 
 const iconItems = [
-  { label: 'Store location', type: 'location', page: 'products' },
+  { label: 'Store location', type: 'location', page: 'store' },
   { label: 'Search', type: 'search', page: 'products' },
-  { label: 'Account', type: 'account', page: 'reviews' },
+  { label: 'Account', type: 'account', page: 'login' },
   { label: 'Cart', type: 'cart', page: 'cart' },
 ];
 
-function Header({ currentPage, onNavigate }) {
+function Header({ currentPage, onNavigate, onSearch }) {
   const [activeMenu, setActiveMenu] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState('Women');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+
   const openedMenu = activeMenu ? navItems.find((item) => item.label === activeMenu) : null;
 
   const handleMenuClick = (item) => {
     setSelectedMenu(item.label);
     setIsMobileMenuOpen(false);
     onNavigate(item.id);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      onSearch(searchInput.trim());
+      setIsSearchOpen(false);
+      setSearchInput('');
+    }
   };
 
   return (
@@ -105,12 +125,29 @@ function Header({ currentPage, onNavigate }) {
         </ul>
 
         <nav className="header-icons" aria-label="member menu">
+          {isSearchOpen && (
+            <form onSubmit={handleSearchSubmit} className="search-form">
+              <input
+                type="text"
+                placeholder="검색어를 입력하세요"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                autoFocus
+              />
+            </form>
+          )}
           {iconItems.map((item) => (
             <button
               type="button"
               aria-label={item.label}
               key={item.label}
-              onClick={() => onNavigate(item.page)}
+              onClick={() => {
+                if (item.type === 'search') {
+                  setIsSearchOpen(!isSearchOpen);
+                } else {
+                  onNavigate(item.page);
+                }
+              }}
             >
               <HeaderIcon type={item.type} />
             </button>
@@ -122,7 +159,7 @@ function Header({ currentPage, onNavigate }) {
             aria-label="Menu"
             onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
           >
-            <HeaderIcon type="menu" />
+            <HeaderIcon type={isMobileMenuOpen ? 'close' : 'menu'} />
           </button>
         </nav>
 

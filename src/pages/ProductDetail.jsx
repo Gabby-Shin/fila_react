@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { ArrowIcon } from '../components/ArrowButton.jsx';
 import { products } from '../data/products.js';
 import CheckpointSection from '../components/CheckpointSection.jsx';
 import ModelCutSection from '../components/ModelCutSection.jsx';
@@ -5,8 +7,13 @@ import ProductReviews from '../components/ProductReviews.jsx';
 
 const sizes = ['XS(85)', 'S(90)', 'M(95)', 'L(100)', 'XL(105)'];
 
-function ProductDetail({ selectedProduct, onNavigate }) {
+function ProductDetail({ selectedProduct, onNavigate, onAddToCart }) {
+  const [selectedSize, setSelectedSize] = useState('');
   const product = selectedProduct || products[0];
+
+  const handleAddToCart = () => {
+    onAddToCart(product, selectedSize);
+  };
 
   return (
     <section className="detail-page">
@@ -34,19 +41,24 @@ function ProductDetail({ selectedProduct, onNavigate }) {
 
             <details className="size-accordion">
               <summary>
-                <strong>사이즈 선택</strong>
-                <span>v</span>
+                <strong>사이즈 선택 {selectedSize && `(${selectedSize})`}</strong>
+                <ArrowIcon direction="down" className="summary-arrow-icon" />
               </summary>
               <div>
                 {sizes.map((size) => (
-                  <button key={size} type="button">
+                  <button
+                    key={size}
+                    type="button"
+                    className={selectedSize === size ? 'active' : ''}
+                    onClick={() => setSelectedSize(size)}
+                  >
                     {size}
                   </button>
                 ))}
               </div>
             </details>
 
-            <button className="cart-button" type="button">
+            <button className="cart-button" type="button" onClick={handleAddToCart}>
               <strong>카트에 추가</strong>
               <strong>{product.price}</strong>
             </button>
@@ -98,7 +110,7 @@ function ProductDetail({ selectedProduct, onNavigate }) {
 
       <CheckpointSection />
       <ModelCutSection />
-      <ProductReviews />
+      <ProductReviews onNavigate={onNavigate} />
     </section>
   );
 }
