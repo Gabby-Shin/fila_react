@@ -11,6 +11,14 @@ import photo8 from '../assets/images/review-photo-8.webp';
 
 const photos = [photo1, photo2, photo3, photo4, photo5, photo6, photo7, photo8];
 
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" width="24" aria-hidden="true">
+      <path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm10 2c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3h10zm-5 3.5A4.5 4.5 0 1 0 16.5 12 4.5 4.5 0 0 0 12 7.5zm0 7A2.5 2.5 0 1 1 14.5 12 2.5 2.5 0 0 1 12 14.5zm4.8-7.8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+    </svg>
+  );
+}
+
 const reviews = [
   {
     name: '짱구짱',
@@ -90,7 +98,9 @@ function ProductReviews({ onNavigate }) {
           {photos.map((photo, index) => (
             <li className="button image_container" key={photo}>
               <img src={photo} alt={`리뷰 포토 ${index + 1}`} />
-              <span>+</span>
+              <span aria-hidden="true">
+                <InstagramIcon />
+              </span>
             </li>
           ))}
         </ul>
@@ -126,7 +136,10 @@ function ProductReviews({ onNavigate }) {
                     <span className="user_icon">
                       <img src={userImage} alt={review.name} />
                     </span>
-                    <span className="user_name">{review.name}</span>
+                    <span className="user_info">
+                      <span className="user_name">{review.name}</span>
+                      <span className="user_stars" aria-label="별점 5점">★★★★★</span>
+                    </span>
                   </div>
 
                   <div className="options">
@@ -145,12 +158,12 @@ function ProductReviews({ onNavigate }) {
                   </div>
 
                   <div className="report">
-                    <button type="button">신고하기</button>
+                    <button type="button">🚫 신고 및 차단</button>
                   </div>
 
                   <div className="thumbs">
-                    <button type="button">좋아요 12</button>
-                    <button type="button">댓글 0</button>
+                    <button type="button">👍 좋아요 12</button>
+                    <button type="button">💬 댓글 0</button>
                   </div>
                 </div>
 

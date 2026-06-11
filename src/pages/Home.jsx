@@ -6,7 +6,7 @@ import Popup from '../components/Popup.jsx';
 import heritageImage from '../assets/images/info-heritage-side.png';
 import { heroSlides, homeImages, products, trendTabs } from '../data/products.js';
 
-function Home({ onNavigate, onProductDetail }) {
+function Home({ onNavigate, onProductDetail, onAddToCart }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupImage, setPopupImage] = useState(homeImages.flow[0]);
   const [activeTrend, setActiveTrend] = useState(trendTabs[0].id);
@@ -205,7 +205,12 @@ function Home({ onNavigate, onProductDetail }) {
         />
       </section>
 
-      <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} popupImage={popupImage} />
+      <Popup
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        popupImage={popupImage}
+        onAddToCart={onAddToCart}
+      />
     </>
   );
 }

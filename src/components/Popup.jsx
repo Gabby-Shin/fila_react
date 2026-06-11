@@ -25,7 +25,7 @@ const popupProducts = [
 
 const formatPrice = (price) => `${price.toLocaleString('ko-KR')}원`;
 
-function Popup({ isOpen, onClose, popupImage = defaultPopupImage }) {
+function Popup({ isOpen, onClose, popupImage = defaultPopupImage, onAddToCart }) {
   const [checkedIds, setCheckedIds] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState({});
   const allChecked = checkedIds.length === popupProducts.length;
@@ -50,6 +50,40 @@ function Popup({ isOpen, onClose, popupImage = defaultPopupImage }) {
       ...prevSizes,
       [productId]: size,
     }));
+  };
+
+  const handleAddSelectedToCart = () => {
+    const selectedProducts = popupProducts.filter((product) => checkedIds.includes(product.id));
+
+    if (selectedProducts.length === 0) {
+      alert('상품을 선택해주세요.');
+      return;
+    }
+
+    const productWithoutSize = selectedProducts.find((product) => !selectedSizes[product.id]);
+
+    if (productWithoutSize) {
+      alert('사이즈를 선택해주세요.');
+      return;
+    }
+
+    if (typeof onAddToCart !== 'function') return;
+
+    selectedProducts.forEach((product) => {
+      onAddToCart(
+        {
+          ...product,
+          id: `popup-${product.id}`,
+          color: product.option,
+          info: [product.option],
+        },
+        selectedSizes[product.id],
+        { silent: true },
+      );
+    });
+
+    alert('선택한 상품이 장바구니에 담겼습니다.');
+    onClose();
   };
 
   return (
@@ -130,7 +164,7 @@ function Popup({ isOpen, onClose, popupImage = defaultPopupImage }) {
               <span>주문금액</span>
               <b>{formatPrice(totalPrice)}</b>
             </div>
-            <button className="cart_btn" type="button">
+            <button className="cart_btn" type="button" onClick={handleAddSelectedToCart}>
               장바구니 담기
             </button>
           </div>

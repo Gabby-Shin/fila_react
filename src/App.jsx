@@ -37,7 +37,8 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAddToCart = (product, size) => {
+  const handleAddToCart = (product, size, options = {}) => {
+    const { silent = false } = options;
     if (!size) {
       alert('사이즈를 선택해주세요.');
       return;
@@ -67,6 +68,8 @@ function App() {
         },
       ];
     });
+
+    if (silent) return true;
 
     alert('상품이 장바구니에 담겼습니다.');
   };

@@ -47,7 +47,6 @@ function Cart({ cartItems, onRemoveFromCart, onUpdateQuantity }) {
       <section className="header">
         <div className="header_container">
           <img src={logo} alt="FILA logo" />
-          <span className="cart-user-icon">가희쨩</span>
         </div>
       </section>
 
