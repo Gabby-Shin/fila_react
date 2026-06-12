@@ -1,4 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import CartButton from '../components/cart/CartButton.jsx';
+import CartCheckbox from '../components/cart/CartCheckbox.jsx';
+import CartDeliveryTabs from '../components/cart/CartDeliveryTabs.jsx';
+import CartItemRow from '../components/cart/CartItemRow.jsx';
+import CartSummaryFooter from '../components/cart/CartSummaryFooter.jsx';
 import logo from '../assets/images/fila-logo.png';
 
 const formatPrice = (price) => {
@@ -8,13 +13,20 @@ const formatPrice = (price) => {
 
 const parsePrice = (price) => {
   if (typeof price === 'number') return price;
-  return parseInt(price.replace(/[^0-9]/g, ''), 10);
+
+  const parsedPrice = parseInt(price.replace(/[^0-9]/g, ''), 10);
+  return Number.isNaN(parsedPrice) ? 0 : parsedPrice;
 };
 
-function Cart({ cartItems, onRemoveFromCart, onUpdateQuantity }) {
+function Cart({
+  cartItems = [],
+  onNavigate,
+  onRemoveFromCart,
+  onUpdateQuantity,
+}) {
+  const [activeDeliveryTab, setActiveDeliveryTab] = useState('standard');
   const [selectedIds, setSelectedIds] = useState([]);
 
-  // Sync selectedIds with cartItems when items are removed
   useEffect(() => {
     setSelectedIds((prevSelected) =>
       prevSelected.filter((uniqueId) => cartItems.some((item) => item.uniqueId === uniqueId)),
@@ -29,6 +41,7 @@ function Cart({ cartItems, onRemoveFromCart, onUpdateQuantity }) {
   );
   const deliveryFee = productTotal > 0 && productTotal < 50000 ? 3000 : 0;
   const orderTotal = productTotal + deliveryFee;
+  const vat = Math.floor(orderTotal / 11);
 
   const handleSelectAll = (event) => {
     setSelectedIds(event.target.checked ? cartItems.map((item) => item.uniqueId) : []);
@@ -42,125 +55,125 @@ function Cart({ cartItems, onRemoveFromCart, onUpdateQuantity }) {
     );
   };
 
+  const handleRemoveSelected = () => {
+    if (selectedIds.length === 0) {
+      alert('삭제할 상품을 선택해 주세요.');
+      return;
+    }
+
+    selectedIds.forEach((uniqueId) => onRemoveFromCart(uniqueId));
+  };
+
+  const handleRemoveSoldOut = () => {
+    const soldOutItems = cartItems.filter((item) => item.soldOut);
+
+    if (soldOutItems.length === 0) {
+      alert('품절 상품이 없습니다.');
+      return;
+    }
+
+    soldOutItems.forEach((item) => onRemoveFromCart(item.uniqueId));
+  };
+
+  const handleOptionChange = () => {
+    alert('옵션 변경은 상품 상세 페이지에서 진행해 주세요.');
+  };
+
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      alert('주문할 상품을 선택해 주세요.');
+      return;
+    }
+
+    alert('주문 기능은 준비 중입니다.');
+  };
+
+  const handleClose = () => {
+    if (typeof onNavigate === 'function') {
+      onNavigate('home');
+    }
+  };
+
   return (
-    <div className="cart-page">
-      <section className="header">
+    <div className="cart-page" aria-labelledby="cart-heading">
+      <section className="header" aria-label="FILA cart header">
         <div className="header_container">
-          <img src={logo} alt="FILA logo" />
+          <img src={logo} alt="FILA logo" width="256" height="256" decoding="async" />
         </div>
       </section>
 
-      <section className="cart_header">
-        <h2>장바구니</h2>
-        <div className="cart_select_area">
-          <label>
-            <input
-              type="checkbox"
-              id="selectAll"
-              checked={allSelected}
-              onChange={handleSelectAll}
-            />
-            전체선택
-          </label>
+      <section className="cart_header" aria-labelledby="cart-heading">
+        <div className="cart_header_text">
+          <h2 id="cart-heading">장바구니</h2>
+          <p>상품이 장바구니에 성공적으로 담겼습니다!</p>
         </div>
+        <button
+          aria-label="장바구니 닫기"
+          className="cart_close_button"
+          onClick={handleClose}
+          type="button"
+        >
+          ×
+        </button>
+        <CartDeliveryTabs
+          activeTab={activeDeliveryTab}
+          itemCount={cartItems.length}
+          onChange={setActiveDeliveryTab}
+        />
       </section>
 
-      <form action="#" className="cart_container" onSubmit={(e) => e.preventDefault()}>
-        <section className="cart_list">
+      <form action="#" className="cart_container" aria-label="Shopping cart" onSubmit={(event) => event.preventDefault()}>
+        <section className="cart_select_area" aria-label="Cart selection tools">
+          <CartCheckbox
+            checked={allSelected}
+            id="selectAll"
+            label={`담긴 상품 ${cartItems.length}개`}
+            onChange={handleSelectAll}
+          />
+          <div className="cart_select_actions">
+            <CartButton onClick={handleRemoveSelected} variant="text">
+              선택 삭제
+            </CartButton>
+            <CartButton onClick={handleRemoveSoldOut} variant="text">
+              품절 삭제
+            </CartButton>
+          </div>
+        </section>
+
+        <section className="cart_list" aria-live="polite" aria-label="Cart item list">
           {cartItems.length === 0 ? (
-            <div className="empty-cart-message" style={{ padding: '80px 0', textAlign: 'center', gridColumn: '1 / 2' }}>
-              장바구니가 비어 있습니다.
+            <div className="empty-cart-message">
+              <strong>장바구니가 비어 있습니다.</strong>
+              <p>마음에 드는 상품을 담아보세요.</p>
+              <CartButton onClick={() => onNavigate?.('products')} variant="primary">
+                상품 보러가기
+              </CartButton>
             </div>
           ) : (
             cartItems.map((item) => (
-              <section className="cart_item" key={item.uniqueId}>
-                <input
-                  type="checkbox"
-                  className="cart_check"
-                  checked={selectedIds.includes(item.uniqueId)}
-                  onChange={() => handleSelectItem(item.uniqueId)}
-                />
-                <div className="image_container">
-                  <img src={item.image} alt={item.name} />
-                </div>
-                <div className="cart_item_info">
-                  <div className="cart_item_info_header">
-                    <span>{item.name}</span>
-                    <button
-                      className="cancel"
-                      type="button"
-                      onClick={() => onRemoveFromCart(item.uniqueId)}
-                    >
-                      x
-                    </button>
-                  </div>
-                  <div className="size">
-                    <div>컬러: {item.color || 'Default'}</div>
-                    <div>사이즈: {item.size}</div>
-                  </div>
-                  <div className="price">{formatPrice(item.price)}</div>
-                  {item.info && item.info.length > 0 && (
-                    <div className="info">
-                      {item.info.map((line) => (
-                        <div key={line}>{line}</div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="quantity">
-                    <button type="button" onClick={() => onUpdateQuantity(item.uniqueId, -1)}>
-                      -
-                    </button>
-                    <input type="text" value={item.quantity} readOnly />
-                    <button type="button" onClick={() => onUpdateQuantity(item.uniqueId, 1)}>
-                      +
-                    </button>
-                  </div>
-                </div>
-              </section>
+              <CartItemRow
+                formatPrice={formatPrice}
+                item={item}
+                key={item.uniqueId}
+                onOptionChange={handleOptionChange}
+                onRemove={onRemoveFromCart}
+                onSelect={handleSelectItem}
+                onUpdateQuantity={onUpdateQuantity}
+                selected={selectedIds.includes(item.uniqueId)}
+              />
             ))
           )}
-
-          <section className="cart_summary">
-            <section className="cart_info">
-              <div className="cart_detail">
-                <h3>주문 상세내역</h3>
-                <div>{selectedItems.length} 상품</div>
-              </div>
-              <div className="cart_total">
-                <div>상품 합계</div>
-                <div>{formatPrice(productTotal)}</div>
-              </div>
-              <div className="cart_delivery">
-                <div>배송비</div>
-                <div>{formatPrice(deliveryFee)}</div>
-              </div>
-              <div className="cart_detail">
-                <h3>총 결제금액</h3>
-                <div>{formatPrice(orderTotal)}</div>
-              </div>
-              <div className="cart_total">
-                <div>세금(VAT)</div>
-                <div>{formatPrice(Math.floor(orderTotal / 11))}</div>
-              </div>
-            </section>
-
-            <div className="coupon">
-              <div>쿠폰</div>
-              <span>&gt;</span>
-            </div>
-
-            <div className="cart_footer">
-              <div>
-                {productTotal < 50000 && productTotal > 0
-                  ? `${(50000 - productTotal).toLocaleString()}원 추가 구매 시 무료배송`
-                  : '무료배송 적용됨'}
-              </div>
-              <a href="#recommend">추천 상품 보기 &gt;</a>
-              <div>주문하기 버튼을 누른 뒤 30분간 재고가 임시 확보됩니다.</div>
-              <button type="button">주문하기</button>
-            </div>
-          </section>
         </section>
+
+        <CartSummaryFooter
+          deliveryFee={deliveryFee}
+          formatPrice={formatPrice}
+          onCheckout={handleCheckout}
+          orderTotal={orderTotal}
+          productTotal={productTotal}
+          selectedCount={selectedItems.length}
+          vat={vat}
+        />
       </form>
     </div>
   );

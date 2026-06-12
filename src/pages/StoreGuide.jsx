@@ -37,18 +37,25 @@ function StorePinIcon() {
 
 function StoreGuide() {
   return (
-    <section className="store-guide-page">
-      <h1>매장안내</h1>
+    <section className="store-guide-page" aria-labelledby="store-guide-heading">
+      <h1 id="store-guide-heading">매장안내</h1>
 
       <div className="store-card-grid">
         {stores.map((store) => (
-          <article className="store-card" key={store.id}>
-            <img src={store.image} alt={`${store.name} 매장`} />
+          <article className="store-card" key={store.id} itemScope itemType="https://schema.org/LocalBusiness">
+            <img
+              src={store.image}
+              alt={`${store.name} 매장`}
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              itemProp="image"
+            />
             <div className="store-card-info">
               <div>
-                <h2>{store.name}</h2>
-                <p>{store.address}</p>
-                <a href={`tel:${store.phone}`}>{store.phone}</a>
+                <h2 itemProp="name">{store.name}</h2>
+                <p itemProp="address">{store.address}</p>
+                <a href={`tel:${store.phone}`} itemProp="telephone">{store.phone}</a>
               </div>
               <StorePinIcon />
             </div>

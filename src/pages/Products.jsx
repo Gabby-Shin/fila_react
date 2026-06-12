@@ -62,7 +62,7 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
   };
 
   return (
-    <section className="products_page">
+    <section className="products_page" aria-labelledby="products-heading">
       <div className="product_list_header">
         <span className="breadcrumb">
           <button type="button">WOMEN</button>
@@ -72,13 +72,18 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
           <button type="button">{searchQuery ? '검색 결과' : activeFilter}</button>
         </span>
 
-        <h1>{searchQuery ? `'${searchQuery}' 검색 결과` : activeFilter}</h1>
+        <h1 id="products-heading">{searchQuery ? `'${searchQuery}' 검색 결과` : activeFilter}</h1>
         {!searchQuery && (
-          <div className="filter_container">
+          <div className="filter_container" aria-label="Product category filters">
             <ul>
               {filters.map((filter) => (
                 <li key={filter}>
-                  <button className="filter_text_btn" type="button" onClick={() => handleFilter(filter)}>
+                  <button
+                    className="filter_text_btn"
+                    type="button"
+                    aria-pressed={activeFilter === filter}
+                    onClick={() => handleFilter(filter)}
+                  >
                     {filter}
                   </button>
                 </li>
@@ -101,7 +106,7 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
             </button>
           </div>
         )}
-        <div className="button_container">
+        <div className="button_container" role="group" aria-label="Product list tools">
           <button className="filter_btn" type="button">
             <span className="filter_icon">+</span>
             <span>필터보기</span>
@@ -113,20 +118,39 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
         </div>
       </div>
 
-      <div className="product_list">
+      <div className="product_list" aria-live="polite">
         {productList.length === 0 ? (
           <div style={{ padding: '80px 0', textAlign: 'center', fontSize: '20px' }}>
             검색 결과가 없습니다.
           </div>
         ) : (
-          <ul id="productList">
+          <ul id="productList" aria-label="Product list">
             {visibleProducts.map((product) => (
-              <li key={product.id}>
-                <button type="button" onClick={() => onProductDetail(product)}>
+              <li key={product.id} itemScope itemType="https://schema.org/Product">
+                <button
+                  type="button"
+                  aria-label={`${product.name} product detail`}
+                  onClick={() => onProductDetail(product)}
+                >
                   <div className="image_container">
                     <div className="image_info">
-                      <img src={product.image} className="main_img" alt={product.name} />
-                      <img src={listHover} className="hover_img" alt={product.name} />
+                      <img
+                        src={product.image}
+                        className="main_img"
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, 25vw"
+                        itemProp="image"
+                      />
+                      <img
+                        src={listHover}
+                        className="hover_img"
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="popup_container">
                       <span>
@@ -140,11 +164,14 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
                     </div>
                   </div>
 
-                  <img src={listThumb1} alt="" />
-                  <img src={listThumb2} alt="" />
-                  <span className="tag">{product.category}</span>
-                  <strong className="title">{product.name}</strong>
-                  <strong className="price">{product.price}</strong>
+                  <img src={listThumb1} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+                  <img src={listThumb2} alt="" loading="lazy" decoding="async" aria-hidden="true" />
+                  <span className="tag" itemProp="category">{product.category}</span>
+                  <strong className="title" itemProp="name">{product.name}</strong>
+                  <strong className="price" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <meta itemProp="priceCurrency" content="KRW" />
+                    <span itemProp="price">{product.price}</span>
+                  </strong>
                 </button>
               </li>
             ))}
@@ -153,7 +180,7 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
       </div>
 
       {productList.length > 0 && (
-        <div className="pagination">
+        <nav className="pagination" aria-label="Product pagination">
           <ArrowButton
             className="pagination_arrow"
             direction="left"
@@ -175,7 +202,7 @@ function Products({ onProductDetail, searchQuery, onSearch }) {
             label="Next page"
             onClick={() => changePage(Math.min(pageCount, currentPage + 1))}
           />
-        </div>
+        </nav>
       )}
     </section>
   );

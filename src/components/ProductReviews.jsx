@@ -19,6 +19,15 @@ function InstagramIcon() {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg className="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10.8 5a5.8 5.8 0 1 0 0 11.6 5.8 5.8 0 0 0 0-11.6Zm0 1.8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" />
+      <path d="m15.2 15.2 4.1 4.1-1.3 1.3-4.1-4.1 1.3-1.3Z" />
+    </svg>
+  );
+}
+
 const reviews = [
   {
     name: '짱구짱',
@@ -52,8 +61,8 @@ const reviews = [
 
 function ProductReviews({ onNavigate }) {
   return (
-    <section id="review">
-      <h2>REVIEW</h2>
+    <section id="review" aria-labelledby="product-review-heading">
+      <h2 id="product-review-heading">REVIEW</h2>
       <button type="button" onClick={() => onNavigate('reviews')}>
         리뷰 작성하기
       </button>
@@ -97,7 +106,13 @@ function ProductReviews({ onNavigate }) {
         <ul>
           {photos.map((photo, index) => (
             <li className="button image_container" key={photo}>
-              <img src={photo} alt={`리뷰 포토 ${index + 1}`} />
+              <img
+                src={photo}
+                alt={`리뷰 포토 ${index + 1}`}
+                loading="lazy"
+                decoding="async"
+                sizes="(max-width: 480px) 30vw, (max-width: 768px) 20vw, 12vw"
+              />
               <span aria-hidden="true">
                 <InstagramIcon />
               </span>
@@ -118,8 +133,10 @@ function ProductReviews({ onNavigate }) {
           <div className="search_container">
             <button type="button">포토/동영상 먼저 보기</button>
             <label className="search">
-              <span>검색</span>
-              <input type="search" placeholder="리뷰 키워드 검색" />
+              <span className="search-icon-wrap">
+                <SearchIcon />
+              </span>
+              <input type="search" placeholder="리뷰 키워드 검색" aria-label="리뷰 키워드 검색" />
             </label>
           </div>
         </div>
@@ -130,15 +147,19 @@ function ProductReviews({ onNavigate }) {
         <section className="reviews">
           <ul>
             {reviews.map((review) => (
-              <li className="item" key={`${review.name}-${review.date}`}>
+              <li className="item" key={`${review.name}-${review.date}`} itemScope itemType="https://schema.org/Review">
                 <div className="contents">
                   <div className="user">
                     <span className="user_icon">
-                      <img src={userImage} alt={review.name} />
+                      <img src={userImage} alt={review.name} loading="lazy" decoding="async" />
                     </span>
                     <span className="user_info">
-                      <span className="user_name">{review.name}</span>
+                      <span className="user_name" itemProp="author">{review.name}</span>
                       <span className="user_stars" aria-label="별점 5점">★★★★★</span>
+                      <span itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                        <meta itemProp="ratingValue" content="5" />
+                        <meta itemProp="bestRating" content="5" />
+                      </span>
                     </span>
                   </div>
 
@@ -147,12 +168,18 @@ function ProductReviews({ onNavigate }) {
                     <span>{review.date}</span>
                   </div>
 
-                  <p>{review.text}</p>
+                  <p itemProp="reviewBody">{review.text}</p>
 
                   <div className="images">
                     {review.images.map((image, index) => (
                       <button className="image_button" type="button" key={image}>
-                        <img src={image} alt={`${review.name} 리뷰 이미지 ${index + 1}`} />
+                        <img
+                          src={image}
+                          alt={`${review.name} 리뷰 이미지 ${index + 1}`}
+                          loading="lazy"
+                          decoding="async"
+                          sizes="(max-width: 480px) 30vw, 120px"
+                        />
                       </button>
                     ))}
                   </div>

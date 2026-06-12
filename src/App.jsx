@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
+import Seo from './components/Seo.jsx';
 import Home from './pages/Home.jsx';
 import Products from './pages/Products.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
@@ -91,7 +92,8 @@ function App() {
   const CurrentPage = pages[currentPage];
 
   return (
-    <div className="app">
+    <div className="app" data-page={currentPage}>
+      <Seo currentPage={currentPage} selectedProduct={selectedProduct} />
       <Header
         currentPage={currentPage}
         onNavigate={(page) => {
@@ -100,7 +102,7 @@ function App() {
         }}
         onSearch={handleSearch}
       />
-      <main>
+      <main id="main-content" aria-label="FILA page content">
         <CurrentPage
           onNavigate={setCurrentPage}
           selectedProduct={selectedProduct}

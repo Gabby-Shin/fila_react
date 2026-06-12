@@ -25,9 +25,9 @@ function ModelCutSection() {
   };
 
   return (
-    <section id="model_cut">
+    <section id="model_cut" aria-labelledby="model-cut-heading">
       <div className="model_cut_title">
-        <h2>모델컷</h2>
+        <h2 id="model-cut-heading">모델컷</h2>
         <div className="buttons">
           <ArrowButton direction="left" label="Previous model image" onClick={() => slideModelCut(-1)} />
           <ArrowButton label="Next model image" onClick={() => slideModelCut(1)} />
@@ -40,10 +40,16 @@ function ModelCutSection() {
         실제 상품의 컬러는 상세 이미지와 가장 가깝습니다.
       </p>
 
-      <div className="image_container" ref={sliderRef}>
+      <div className="image_container" ref={sliderRef} aria-label="Model cut images">
         {modelImages.map((image, index) => (
           <div className="image_container_card show" key={image}>
-            <img src={image} alt={`모델컷 ${index + 1}`} />
+            <img
+              src={image}
+              alt={`모델컷 ${index + 1}`}
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 480px) 70vw, (max-width: 768px) 45vw, 25vw"
+            />
           </div>
         ))}
       </div>

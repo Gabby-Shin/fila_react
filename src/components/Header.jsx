@@ -74,15 +74,35 @@ function Header({ currentPage, onNavigate, onSearch }) {
   const [activeMenu, setActiveMenu] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState('Women');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeMobileMenu, setActiveMobileMenu] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [isCouponVisible, setIsCouponVisible] = useState(true);
 
   const openedMenu = activeMenu ? navItems.find((item) => item.label === activeMenu) : null;
+  const headerClassName = [
+    currentPage === 'home' ? 'site-header' : 'site-header dark',
+    isCouponVisible ? '' : 'coupon-hidden',
+  ].filter(Boolean).join(' ');
 
   const handleMenuClick = (item) => {
     setSelectedMenu(item.label);
+    setActiveMobileMenu(null);
     setIsMobileMenuOpen(false);
     onNavigate(item.id);
+  };
+
+  const handleMobileMenuButtonClick = () => {
+    setIsMobileMenuOpen((isOpen) => {
+      const nextOpen = !isOpen;
+      setActiveMobileMenu(null);
+      return nextOpen;
+    });
+  };
+
+  const handleMobileMenuTitleClick = (item) => {
+    setSelectedMenu(item.label);
+    setActiveMobileMenu((current) => (current === item.label ? null : item.label));
   };
 
   const handleSearchSubmit = (e) => {
@@ -96,21 +116,37 @@ function Header({ currentPage, onNavigate, onSearch }) {
 
   return (
     <>
-      <div className="coupon_info_container coupon-info-container">
-        <button type="button" onClick={() => onNavigate('reviews')}>
-          FILA 카카오 플러스친구 추가 시 10% 쿠폰
-        </button>
-      </div>
+      {isCouponVisible && (
+        <div className="coupon_info_container coupon-info-container">
+          <button type="button" onClick={() => onNavigate('reviews')}>
+            FILA 카카오 플러스친구 추가 시 10% 쿠폰
+          </button>
+          <button
+            className="coupon-info-close"
+            type="button"
+            aria-label="쿠폰 알림 닫기"
+            onClick={() => setIsCouponVisible(false)}
+          >
+            <HeaderIcon type="close" />
+          </button>
+        </div>
+      )}
 
       <header
-        className={currentPage === 'home' ? 'site-header' : 'site-header dark'}
+        className={headerClassName}
+        role="banner"
         onMouseLeave={() => setActiveMenu(null)}
       >
-        <button className="home_btn home-btn" type="button" onClick={() => onNavigate('home')}>
-          <img src={logo} alt="FILA" />
+        <button
+          className="home_btn home-btn"
+          type="button"
+          aria-label="FILA home"
+          onClick={() => onNavigate('home')}
+        >
+          <img src={logo} alt="FILA" width="256" height="256" decoding="async" />
         </button>
 
-        <ul className="main_menu main-menu">
+        <ul className="main_menu main-menu" role="navigation" aria-label="Primary menu">
           {navItems.map((item) => (
             <li key={item.label} onMouseEnter={() => setActiveMenu(item.label)}>
               <button
@@ -124,11 +160,12 @@ function Header({ currentPage, onNavigate, onSearch }) {
           ))}
         </ul>
 
-        <nav className="header-icons" aria-label="member menu">
+        <nav className="header-icons" aria-label="Utility menu">
           {isSearchOpen && (
-            <form onSubmit={handleSearchSubmit} className="search-form">
+            <form id="siteSearchForm" onSubmit={handleSearchSubmit} className="search-form" role="search">
               <input
-                type="text"
+                type="search"
+                aria-label="Search products"
                 placeholder="검색어를 입력하세요"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -140,6 +177,8 @@ function Header({ currentPage, onNavigate, onSearch }) {
             <button
               type="button"
               aria-label={item.label}
+              aria-expanded={item.type === 'search' ? isSearchOpen : undefined}
+              aria-controls={item.type === 'search' ? 'siteSearchForm' : undefined}
               key={item.label}
               onClick={() => {
                 if (item.type === 'search') {
@@ -156,15 +195,16 @@ function Header({ currentPage, onNavigate, onSearch }) {
             className="mobile_menu_btn"
             type="button"
             aria-expanded={isMobileMenuOpen}
+            aria-controls="mobileHeaderMenu"
             aria-label="Menu"
-            onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+            onClick={handleMobileMenuButtonClick}
           >
             <HeaderIcon type={isMobileMenuOpen ? 'close' : 'menu'} />
           </button>
         </nav>
 
         {openedMenu && (
-          <div className="sub-menu-container active">
+          <div className="sub-menu-container active" role="navigation" aria-label={`${openedMenu.label} submenu`}>
             {openedMenu.columns.map((column) => (
               <div key={column}>
                 <b className="sub-menu-title">
@@ -186,13 +226,25 @@ function Header({ currentPage, onNavigate, onSearch }) {
           </div>
         )}
 
-        <div className={isMobileMenuOpen ? 'mobile_header_menu active' : 'mobile_header_menu'}>
+        <div
+          id="mobileHeaderMenu"
+          className={isMobileMenuOpen ? 'mobile_header_menu active' : 'mobile_header_menu'}
+          aria-hidden={!isMobileMenuOpen}
+        >
           {navItems.map((item) => (
             <section className="mobile_menu_group" key={item.label}>
-              <button className="mobile_menu_title" type="button" onClick={() => handleMenuClick(item)}>
+              <button
+                className={activeMobileMenu === item.label ? 'mobile_menu_title active' : 'mobile_menu_title'}
+                type="button"
+                aria-expanded={activeMobileMenu === item.label}
+                onClick={() => handleMobileMenuTitleClick(item)}
+              >
                 {item.label}
               </button>
-              <div className="mobile_menu_columns">
+              <div
+                className={activeMobileMenu === item.label ? 'mobile_menu_columns active' : 'mobile_menu_columns'}
+                aria-hidden={activeMobileMenu !== item.label}
+              >
                 {item.columns.map((column) => (
                   <div key={column}>
                     <button type="button" onClick={() => handleMenuClick(item)}>{column}</button>

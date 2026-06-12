@@ -137,10 +137,11 @@ function LookSlider({ images, onItemClick }) {
   };
 
   return (
-    <div className="slide_wrapper">
+    <div className="slide_wrapper" aria-label="FILA shop the look slider">
       <ul
         className={isDragging ? 'slide_container dragging' : 'slide_container'}
         ref={slideContainerRef}
+        aria-label="Shop the Look images"
         onMouseEnter={() => {
           isHoveringRef.current = true;
         }}
@@ -160,7 +161,8 @@ function LookSlider({ images, onItemClick }) {
             <li
               key={`${image}-${index}`}
               role="button"
-              tabIndex={0}
+              tabIndex={isClone ? -1 : 0}
+              aria-label={`FILA look ${imageIndex + 1} 자세히 보기`}
               aria-hidden={isClone ? 'true' : undefined}
               onClick={(event) => handleClick(event, imageIndex)}
               onKeyDown={(event) => {
@@ -172,6 +174,9 @@ function LookSlider({ images, onItemClick }) {
               <img
                 src={image}
                 alt={`FILA look ${imageIndex + 1}`}
+                loading="lazy"
+                decoding="async"
+                sizes="(max-width: 480px) 80vw, (max-width: 768px) 45vw, 28vw"
                 className={imageIndex === 0 && !isClone ? 'open_popup' : undefined}
               />
             </li>

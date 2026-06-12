@@ -63,9 +63,9 @@ function Footer() {
   };
 
   return (
-    <footer>
+    <footer role="contentinfo">
       <div className="footer_container">
-        <section className="site_nav">
+        <section className="site_nav" aria-label="Footer site navigation">
           {footerMenus.map((menu) => {
             const isOpen = openMenus.includes(menu.title);
 
@@ -95,7 +95,7 @@ function Footer() {
         </section>
 
         <section className="sns_nav">
-          <nav>
+          <nav aria-label="FILA social links">
             <ul>
               {socialItems.map((item) => (
                 <li key={item}>
@@ -109,7 +109,7 @@ function Footer() {
         </section>
       </div>
 
-      <section className="info_nav">
+      <section className="info_nav" aria-label="Policy and contact information">
         <div className="policy">
           <ul>
             {policies.map((policy) => (
@@ -121,8 +121,8 @@ function Footer() {
         </div>
         <div className="me_information">
           <div className="name">신가희</div>
-          <div className="email">rkgml900@naver.com</div>
-          <div className="text">평일 월 - 금 : 09시 - 18시 (공휴일 제외)</div>
+          <div className="email">rkgml990@gmail.com</div>
+          <div className="text">평일 월 - 금 : 09시 - 12시 (공휴일 제외)</div>
         </div>
       </section>
 

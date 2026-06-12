@@ -102,6 +102,8 @@ function HeroCarousel({ slides }) {
   return (
     <section
       className="carousel_container"
+      aria-label="FILA featured promotions"
+      aria-roledescription="carousel"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onPointerDown={handlePointerDown}
@@ -114,21 +116,30 @@ function HeroCarousel({ slides }) {
 
       <ul
         className="carousel"
+        aria-live={isPaused ? 'polite' : 'off'}
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
           transitionDuration: isMoving ? `${slideMoveMillisecond}ms` : '0ms',
         }}
       >
         {slides.map((slide, index) => (
-          <li className="slide" key={slide.id}>
+          <li
+            className="slide"
+            key={slide.id}
+            aria-hidden={index !== currentIndex}
+            aria-label={`${index + 1} / ${slides.length}`}
+            aria-roledescription="slide"
+          >
             <video
               ref={(element) => {
                 videoRefs.current[index] = element;
               }}
+              aria-label={slide.title}
               autoPlay
               muted
               loop
               playsInline
+              preload={index === 0 ? 'auto' : 'metadata'}
             >
               <source src={slide.video} type="video/mp4" />
             </video>

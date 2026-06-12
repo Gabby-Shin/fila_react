@@ -30,7 +30,7 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
   };
 
   const moveSlide = (direction) => {
-    const maxIndex = trendingProducts.length - 5; // Show 5 at a time
+    const maxIndex = trendingProducts.length - 4;
     setSlideIndex((prev) => {
       const next = prev + direction;
       if (next < 0) return 0;
@@ -41,21 +41,23 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
 
   return (
     <>
-      <section className="hero_section">
+      <section className="hero_section" aria-label="FILA main promotion">
         <HeroCarousel slides={heroSlides} />
       </section>
 
-      <section className="trending_section">
-        <h2>Trending Now</h2>
+      <section className="trending_section" aria-labelledby="trending-heading">
+        <h2 id="trending-heading">Trending Now</h2>
 
-        <div>
-          <ul className="list">
+        <div aria-label="Trending product categories">
+          <ul className="list" role="list">
             {trendTabs.map((tab) => (
               <li key={tab.id}>
                 <button
                   className={tab.id === activeTrend ? 'trend_btn active' : 'trend_btn'}
                   type="button"
                   data-category={tab.id}
+                  aria-pressed={tab.id === activeTrend}
+                  aria-controls="trendingProductList"
                   onClick={() => handleTrendChange(tab.id)}
                 >
                   {tab.label}
@@ -78,9 +80,10 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
           </div>
         </div>
 
-        <div className="product_list" style={{ overflow: 'hidden' }}>
+        <div className="product_list" aria-live="polite" style={{ overflow: 'hidden' }}>
           <ul
             id="trendingProductList"
+            aria-label="Trending products"
             style={{
               display: 'flex',
               flexWrap: 'nowrap',
@@ -92,23 +95,36 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
               <li
                 key={product.viewId}
                 data-category={product.trendCategory}
+                itemScope
+                itemType="https://schema.org/Product"
                 style={{ flex: '0 0 var(--trend-card-width, 20%)', padding: '0 var(--trend-card-gutter, 10px)' }}
               >
                 <a
                   href="#product-detail"
+                  aria-label={`${product.name} 상품 상세 보기`}
                   onClick={(event) => {
                     event.preventDefault();
                     onProductDetail(product);
                   }}
                 >
                   <div className="image_container">
-                    <img src={product.image} alt={product.name} />
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      loading="lazy"
+                      decoding="async"
+                      sizes="(max-width: 480px) 40vw, (max-width: 768px) 33vw, 25vw"
+                      itemProp="image"
+                    />
                   </div>
                   <div className="list_info">
                     <span>
-                      <p>{product.category}</p>
-                      <strong>{product.name}</strong>
-                      <b>{product.price}</b>
+                      <p itemProp="category">{product.category}</p>
+                      <strong itemProp="name">{product.name}</strong>
+                      <b itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                        <meta itemProp="priceCurrency" content="KRW" />
+                        <span itemProp="price">{product.price}</span>
+                      </b>
                     </span>
                   </div>
                 </a>
@@ -118,16 +134,35 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
         </div>
       </section>
 
-      <section className="edit_section">
+      <section className="edit_section" aria-labelledby="fila-edit-heading">
         <div className="image_container">
-          <img className="main" src={homeImages.editMain} alt="FILA editorial model" />
-          <img className="sub" src={homeImages.editSub} alt="FILA sneakers" />
+          <img
+            className="main"
+            src={homeImages.editMain}
+            alt="FILA editorial model"
+            loading="lazy"
+            decoding="async"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          <img
+            className="sub"
+            src={homeImages.editSub}
+            alt="FILA sneakers"
+            loading="lazy"
+            decoding="async"
+            sizes="(max-width: 768px) 50vw, 25vw"
+          />
         </div>
         <div className="label_container">
-          <h2>Fila Edit</h2>
+          <h2 id="fila-edit-heading">Fila Edit</h2>
           <div>
             {['Daily,', 'ARC,', 'Seoul,', 'Tennis,', 'Speed-Serve 2.0', 'Windbreaker,' ,'실릭 실루엣,', 'Heritage,','썸머 슈즈,','Holiday'].map((label) => (
-              <button type="button" key={label} onClick={() => onNavigate('products')}>
+              <button
+                type="button"
+                key={label}
+                aria-label={`${label} 상품 보기`}
+                onClick={() => onNavigate('products')}
+              >
                 {label}
               </button>
             ))}
@@ -135,15 +170,21 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
         </div>
       </section>
 
-      <section className="information1_section">
-        <h3>
+      <section className="information1_section" aria-labelledby="fila-history-heading">
+        <h3 id="fila-history-heading">
           The beginning of FILA
           <br />
           1911 & Everyday
         </h3>
         <div>
           <article className="info_card">
-            <img src={homeImages.info1} alt="FILA tennis style guide" />
+            <img
+              src={homeImages.info1}
+              alt="FILA tennis style guide"
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 480px) 100vw, 50vw"
+            />
             <span className="information">
               <h4>Control The Court</h4>
               <p>코트 위 움직임을 위해 설계된 FILA tennis style.</p>
@@ -155,7 +196,13 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
             />
           </article>
           <article className="info_card">
-            <img src={homeImages.info2} alt="FILA heritage collection" />
+            <img
+              src={homeImages.info2}
+              alt="FILA heritage collection"
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 480px) 100vw, 50vw"
+            />
             <span className="information">
               <h4>Pace Your Day</h4>
               <p>일상부터 퍼포먼스까지 편안하게 이어지는 컬렉션.</p>
@@ -169,28 +216,36 @@ function Home({ onNavigate, onProductDetail, onAddToCart }) {
         </div>
       </section>
 
-      <section className="heritage_split_section">
-        <article className="heritage_split_card">
+      <section className="heritage_split_section" aria-labelledby="heritage-heading">
+        <article className="heritage_split_card" itemScope itemType="https://schema.org/Brand">
           <div className="heritage_split_content">
             <div className="heritage_split_logo" aria-hidden="true" />
             <p>FILA 아카이브를 기반으로 브랜드의 클래식한 정체성을 담아낸 헤리티지 컬렉션을 소개합니다.</p>
-            <strong>1911 & Everyday Since</strong>
+            <strong id="heritage-heading" itemProp="name">1911 & Everyday Since</strong>
             <ArrowButton
               className="white-button rounded heritage_split_arrow"
               label="View heritage collection"
               onClick={() => onNavigate('products')}
             />
           </div>
-          <img src={heritageImage} alt="FILA heritage collection" />
+          <img
+            src={heritageImage}
+            alt="FILA heritage collection"
+            loading="lazy"
+            decoding="async"
+            sizes="(max-width: 480px) 100vw, 48vw"
+            itemProp="image"
+          />
         </article>
       </section>
 
-      <section className="information4_section">
+      <section className="information4_section" aria-labelledby="shop-look-heading">
         <div>
-          <h2>Shop the Look</h2>
+          <h2 id="shop-look-heading">Shop the Look</h2>
           <ArrowButton
             type="button"
             className="arrow_button arrow-button rounded information4_button"
+            label="View Shop the Look products"
             onClick={() => onNavigate('products')}
           >
             <span>더보기</span>

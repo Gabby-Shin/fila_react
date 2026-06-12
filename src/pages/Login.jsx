@@ -13,27 +13,38 @@ function Login({ onNavigate }) {
   };
 
   return (
-    <section className="login-page content-section">
+    <section className="login-page content-section" aria-labelledby="login-heading">
       <SectionTitle
         eyebrow="Member"
+        id="login-heading"
         title={isLoginView ? '로그인' : '회원가입'}
         description={isLoginView ? 'FILA 통합회원 계정으로 로그인해주세요.' : 'FILA의 새로운 회원이 되어 다양한 혜택을 누려보세요.'}
       />
 
       <div className="login-container" style={{ maxWidth: '400px', margin: '0 auto' }}>
-        <form onSubmit={handleSubmit} className="review-form" style={{ display: 'grid', gap: '20px' }}>
+        <form
+          onSubmit={handleSubmit}
+          className="review-form"
+          aria-label={isLoginView ? 'Login form' : 'Sign up form'}
+          style={{ display: 'grid', gap: '20px' }}
+        >
           <label>
             아이디(이메일)
-            <input type="email" placeholder="email@example.com" required />
+            <input type="email" placeholder="email@example.com" autoComplete="email" inputMode="email" required />
           </label>
           <label>
             비밀번호
-            <input type="password" placeholder="비밀번호를 입력하세요" required />
+            <input
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+              autoComplete={isLoginView ? 'current-password' : 'new-password'}
+              required
+            />
           </label>
           {!isLoginView && (
             <label>
               비밀번호 확인
-              <input type="password" placeholder="비밀번호를 다시 입력하세요" required />
+              <input type="password" placeholder="비밀번호를 다시 입력하세요" autoComplete="new-password" required />
             </label>
           )}
           <button type="submit" className="primary-button" style={{ width: '100%', padding: '15px' }}>

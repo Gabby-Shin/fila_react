@@ -93,15 +93,16 @@ function ReviewBoard() {
   };
 
   return (
-    <section className="content-section review-page">
+    <section className="content-section review-page" aria-labelledby="review-board-heading">
       <SectionTitle
         eyebrow="CRUD Board"
+        id="review-board-heading"
         title="상품 리뷰 게시판"
         description="리뷰 작성, 목록 조회, 수정, 삭제가 가능한 CRUD 페이지입니다."
       />
 
       <div className="review-layout">
-        <form className="review-form" onSubmit={handleSubmit}>
+        <form className="review-form" aria-label="Product review form" onSubmit={handleSubmit}>
           <h3>{isEditing ? '리뷰 수정' : '리뷰 작성'}</h3>
 
           <label>
@@ -158,26 +159,28 @@ function ReviewBoard() {
           </div>
         </form>
 
-        <div className="review-list">
+        <div className="review-list" aria-live="polite" aria-label="Product review list">
           {reviews.length === 0 ? (
             <p className="empty-message">등록된 리뷰가 없습니다.</p>
           ) : (
             reviews.map((review) => (
-              <article className="review-item" key={review.id}>
+              <article className="review-item" key={review.id} itemScope itemType="https://schema.org/Review">
                 <div>
-                  <span>{review.product}</span>
-                  <h3>{review.name}</h3>
-                  <p>{review.content}</p>
-                  <strong>
+                  <span itemProp="itemReviewed">{review.product}</span>
+                  <h3 itemProp="author">{review.name}</h3>
+                  <p itemProp="reviewBody">{review.content}</p>
+                  <strong itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                    <meta itemProp="ratingValue" content={String(review.rating)} />
+                    <meta itemProp="bestRating" content="5" />
                     {'★'.repeat(review.rating)}
                     {'☆'.repeat(5 - review.rating)}
                   </strong>
                 </div>
                 <div className="review-actions">
-                  <button type="button" onClick={() => handleEdit(review)}>
+                  <button type="button" aria-label={`${review.product} review edit`} onClick={() => handleEdit(review)}>
                     수정
                   </button>
-                  <button type="button" onClick={() => handleDelete(review.id)}>
+                  <button type="button" aria-label={`${review.product} review delete`} onClick={() => handleDelete(review.id)}>
                     삭제
                   </button>
                 </div>

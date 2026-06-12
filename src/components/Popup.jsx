@@ -72,10 +72,11 @@ function Popup({ isOpen, onClose, popupImage = defaultPopupImage, onAddToCart })
     selectedProducts.forEach((product) => {
       onAddToCart(
         {
-          ...product,
           id: `popup-${product.id}`,
-          color: product.option,
-          info: [product.option],
+          image: product.image,
+          name: product.name,
+          option: product.option,
+          price: product.price,
         },
         selectedSizes[product.id],
         { silent: true },
@@ -90,15 +91,17 @@ function Popup({ isOpen, onClose, popupImage = defaultPopupImage, onAddToCart })
     <div
       id="popupOverlay"
       className={isOpen ? 'popup_overlay active' : 'popup_overlay'}
+      aria-hidden={!isOpen}
+      role="presentation"
       onClick={(event) => {
         if (event.target.id === 'popupOverlay') {
           onClose();
         }
       }}
     >
-      <div className="popup">
+      <div className="popup" role="dialog" aria-modal="true" aria-label="Shop the look products">
         <div className="popup_left">
-          <img src={popupImage} alt="Selected FILA look" />
+          <img src={popupImage} alt="Selected FILA look" loading="lazy" decoding="async" />
         </div>
 
         <div className="popup_right">
@@ -116,9 +119,9 @@ function Popup({ isOpen, onClose, popupImage = defaultPopupImage, onAddToCart })
             </div>
           </div>
 
-          <div className="product_list">
+          <div className="product_list" role="group" aria-label="Popup product list">
             {popupProducts.map((product) => (
-              <div className="product" key={product.id}>
+              <div className="product" key={product.id} itemScope itemType="https://schema.org/Product">
                 <label className="product_top">
                   <input
                     type="checkbox"
@@ -128,11 +131,14 @@ function Popup({ isOpen, onClose, popupImage = defaultPopupImage, onAddToCart })
                   />
                   <span className="check_box" />
 
-                  <img src={product.image} alt={product.name} />
+                  <img src={product.image} alt={product.name} loading="lazy" decoding="async" itemProp="image" />
                   <div className="info">
-                    <b>{product.name}</b>
+                    <b itemProp="name">{product.name}</b>
                     <span>{product.option}</span>
-                    <strong>{formatPrice(product.price)}</strong>
+                    <strong itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                      <meta itemProp="priceCurrency" content="KRW" />
+                      <span itemProp="price">{formatPrice(product.price)}</span>
+                    </strong>
                   </div>
                 </label>
 
