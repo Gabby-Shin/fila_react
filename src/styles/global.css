@@ -6660,9 +6660,6 @@ footer .corporate_container .site_information {
 }
 
 @media screen and (min-width: 481px) {
-  footer .site_nav ul {
-    gap: 16px;
-  }
 
   footer .site_nav li {
     margin-bottom: 0;
@@ -7012,7 +7009,7 @@ footer .corporate_container .site_information {
 
 .cart-summary-footer {
   margin-top: 24px;
-  padding: 24px 0;
+  padding: 24px;
   border-radius: 18px;
   background: #f6f6f6;
 }
@@ -7259,7 +7256,7 @@ footer .corporate_container .site_information {
   }
 
   .cart-summary-footer {
-    padding: 24px 0;
+    padding: 24px;
     border-radius: 14px;
   }
 
